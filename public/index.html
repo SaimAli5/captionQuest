@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>captionQuote</title>
+    <script src="./scripts/index.js" async></script>
+    <style>
+      h1 {
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 20vh;
+      }
+      .image-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 80%;
+        margin: auto;
+        margin-top: 50px;
+      }
+
+      .image-container img {
+        width: 90%;
+        height: auto;
+        margin-right: 10px;
+      }
+
+      .caption-form {
+        display: flex;
+        flex-direction: column;
+        width: 70%;
+        overflow: auto;
+      }
+
+      .caption-form label, .caption-form textarea, .caption-form button {
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Have Fun!</h1>
+
+    <div class="image-container">
+      <div class="image-col">
+        <img id="image_1" src="./images/image_1.jpg" alt="Image 1">
+        <form class="caption-form">
+          <label for="caption1">Add a caption:</label>
+          <textarea id="caption1" name="caption1"></textarea>
+          <button id="button1" type="submit">Send</button>
+        </form>
+      </div>
+      <div class="image-col">
+        <img src="./images/image_2.jpg" alt="Image 2">
+        <form class="caption-form">
+          <label for="caption2">Add a caption:</label>
+          <textarea id="caption2" name="caption2"></textarea>
+          <button id="button2" type="submit">Send</button>
+        </form>
+      </div>
+      <div class="image-col">
+        <img src="./images/image_3.jpg" alt="Image 3">
+        <form class="caption-form">
+          <label for="caption3">Add a caption:</label>
+          <textarea id="caption3" name="caption3"></textarea>
+          <button id="button3" type="submit">Send</button>
+        </form>
+      </div>
+    </div>
+
+  </body>
+</html>
