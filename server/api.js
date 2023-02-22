@@ -24,10 +24,12 @@ apiRouter.use(passport.initialize());
 apiRouter.use(passport.session());
 
 passport.serializeUser((user, done) =>{
+  console.log("serialize")
   done(null, user[0].id)
 });
 
 passport.deserializeUser( async (id, done) =>{
+  console.log("deserialize")
   const query =  `SELECT * FROM users WHERE id = ${id}`
   await pool.query(query, (err, user) =>{
     if(err){
@@ -55,7 +57,7 @@ passport.use( new localStrategy(
         console.log('wrong password')
         return done(null, false);
       }
-      console.log('success')
+      console.log('successfull authentication')
       return done(null, user.rows)
     });
   }
@@ -83,6 +85,7 @@ apiRouter.post("/", async (req, res, next) =>{
 apiRouter.post("/login", 
       passport.authenticate('local', {failureRedirect: 'http://localhost:3000/login.html'}),
       (req, res, next) =>{
+        console.log(req.session);
         res.redirect("http://localhost:3000/");
 });
 
@@ -94,7 +97,8 @@ apiRouter.post("/register", async (req, res, next) =>{
   try{
        const newUser = await pool.query(query, [username, password]);
        if(newUser.rowCount > 0){
-          res.redirect("http://localhost:3000/login.html")
+          console.log("successfull registration");
+          res.redirect("http://localhost:3000/login.html");
        } else {
           res.status(400).send({
             message: "Registration failed"
@@ -105,6 +109,17 @@ apiRouter.post("/register", async (req, res, next) =>{
   }
 });
 
+// logout
+apiRouter.get("/logout", (req, res, next) =>{
+  req.logout((err) => {
+    if (err) {
+      console.error(err);
+      return next(err);
+    }
+    console.log("successfull logout")
+    res.redirect("http://localhost:3000/login.html");
+  });
+})
 
 // Error handler
 apiRouter.use((err, req, res, next)=>{

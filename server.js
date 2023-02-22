@@ -9,7 +9,7 @@ app.use(bodyParser.json());
 
 
 // API router mounted from /api.js
-const apiRouter = require("./api");
+const apiRouter = require("./server/api");
 app.use("/", apiRouter);
 
 
