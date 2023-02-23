@@ -7,6 +7,8 @@ const store = new session.MemoryStore();
 // passport.js
 const passport = require('passport');
 const localStrategy = require('passport-local').Strategy;
+// password hash
+const bcrypt = require("bcrypt");
 
 // session config
 apiRouter.use(
@@ -43,9 +45,14 @@ passport.deserializeUser( async (id, done) =>{
 // login authentication
 passport.use( new localStrategy(
   async (username, password, done) =>{
-    const query = `SELECT * FROM users WHERE username = $1`
+    // hashed-password check
+    const passwordQuery = `SELECT password FROM users WHERE username = $1`
+    const hashedPassword = await pool.query(passwordQuery, [username]);
+    // return false if password is wrong
+    const userPassword = await bcrypt.compare(password, hashedPassword.rows[0].password);
 
-    await pool.query(query, [username], (err, user) =>{
+    const usernameQuery = `SELECT * FROM users WHERE username = $1`
+    await pool.query(usernameQuery, [username], (err, user) =>{
       if(err){
         return done(err);
       }
@@ -53,7 +60,7 @@ passport.use( new localStrategy(
         console.log('no user')
         return done(null, false);
       }
-      if(user.rows[0].password !== password){
+      if(!userPassword){
         console.log('wrong password')
         return done(null, false);
       }
@@ -81,28 +88,53 @@ apiRouter.post("/", async (req, res, next) =>{
   }
 });
 
+apiRouter.get("/:imageId", async (req, res, next) =>{
+  const imageId = req.params.imageId;
+  const query = `SELECT caption_table.caption, users.username FROM caption_table JOIN users 
+  ON users.id = caption_table.user_id
+  WHERE image_id = $1`;
+
+  try{
+      const allCaptions = await pool.query(query, [imageId]);
+      if(allCaptions.rowCount < 1){
+        res.send({
+          message: "No caption found "
+        })
+      }
+      res.send({
+        status: "Success",
+        message: "Captions successfully found",
+        data: allCaptions.rows
+      });
+  } catch(err){
+    next(err);
+  }
+});
+
 // login
 apiRouter.post("/login", 
       passport.authenticate('local', {failureRedirect: 'http://localhost:3000/login.html'}),
       (req, res, next) =>{
         console.log(req.session);
-        res.redirect("http://localhost:3000/");
+        res.redirect("http://localhost:3000/index.html");
 });
 
 // register
 apiRouter.post("/register", async (req, res, next) =>{
        const {username, password} = req.body;
        const query =  `INSERT INTO users (username, password) VALUES ($1, $2) RETURNING *`;
+       const salt = await bcrypt.genSalt(10);
+       const hashedPassword = await bcrypt.hash(password, salt);
 
   try{
-       const newUser = await pool.query(query, [username, password]);
+       const newUser = await pool.query(query, [username, hashedPassword]);
        if(newUser.rowCount > 0){
           console.log("successfull registration");
           res.redirect("http://localhost:3000/login.html");
        } else {
           res.status(400).send({
             message: "Registration failed"
-            })
+          })
        };
   } catch(err) {
     next(err);
@@ -113,6 +145,7 @@ apiRouter.post("/register", async (req, res, next) =>{
 apiRouter.get("/logout", (req, res, next) =>{
   req.logout((err) => {
     if (err) {
+      console.log("error here")
       console.error(err);
       return next(err);
     }
@@ -123,6 +156,7 @@ apiRouter.get("/logout", (req, res, next) =>{
 
 // Error handler
 apiRouter.use((err, req, res, next)=>{
+    console.error(err);
     console.error(err.stack);
     res.status(500).send("An error occurred, please try again later.");
 })
