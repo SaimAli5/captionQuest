@@ -6,6 +6,8 @@ const caption3 = document.getElementById("caption3");
 const button1 = document.getElementById("button1");
 const button2 = document.getElementById("button2");
 const button3 = document.getElementById("button3");
+// logout
+const logoutButton = document.getElementById("logout");
 
 
 const eventHandler1 = async () =>{
@@ -74,6 +76,21 @@ const eventHandler3 = async () =>{
       }
 };
 
+const logoutHandler = async () =>{
+  event.preventDefault();
+  const url = 'http://localhost:3000/logout';
+
+  try{
+    const logoutResponse = await fetch(url);
+    if (logoutResponse.redirected){
+       window.location.href = logoutResponse.url;
+       }
+  } catch (err){
+    console.log(err);
+  }
+};
+
+logoutButton.addEventListener("click", logoutHandler)
 
 button1.addEventListener("click", eventHandler1);
   
