@@ -1,0 +1,115 @@
+openapi: 3.0.1
+info:
+  title: CaptionQuest
+  version: 1.0.0
+  description: >-
+    A photo-caption contest web app where users can submit their captions for
+    various images through there own private account. The app provides a
+    platform for users to showcase their creativity and humor, and offers a
+    variety of images for users to create there caption own.
+  license:
+    name: ISC Licence
+    url: https://en.wikipedia.org/wiki/ISC_license
+paths:
+  /login:
+    post:
+      summary: User authentication
+      description: Provide user access to the website after authentication
+      operationId: userAuthentication
+      requestBody:
+        description: Login credentials
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+        required: true
+      responses:
+        '302':
+          description: Redirect to home page
+        '401':
+          description: Login failed
+      tags:
+        - Login
+  /register:
+    post:
+      summary: User Registeration
+      description: Create an account for user and redirect to login page for authorization
+      operationId: userRegisteration
+      requestBody:
+        description: Registration credentials
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+        required: true
+      responses:
+        '302':
+          description: Redirect to login page
+        '400':
+          description: Sign up failed
+      tags:
+        - Login
+  /caption/{imageId}:
+    get:
+      summary: Get all captions of an image
+      description: >-
+        Get all caption's and their author's name according to the image id
+        provided
+      operationId: GetAllCaptions
+      parameters:
+        - name: imageId
+          in: path
+          description: Image Id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                Requested image's captions and their author's username:
+                  value: |-
+                    {
+                      "content": "caption content here",
+                      "username": "Saim Ali Nadeem"
+                    }
+          description: Successful operation
+        '400':
+          description: No spending category found.
+      tags:
+        - Caption
+  /caption:
+    post:
+      summary: Adding user caption
+      description: Adding users provided caption to the database with the respective image
+      operationId: captionSubmission
+      requestBody:
+        description: Caption content and image id submission
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                caption:
+                  type: string
+                image_id:
+                  type: integer
+        required: true
+      responses:
+        '201':
+          description: Caption created
+        '400':
+          description: Error
+      tags:
+        - Caption
