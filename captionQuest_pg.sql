@@ -40,9 +40,6 @@ CREATE TABLE "public.User_Image" (
 );
 
 
-
-
-
 ALTER TABLE "Caption_table" ADD CONSTRAINT "Caption_table_fk0" FOREIGN KEY ("user_id") REFERENCES "User"("id");
 ALTER TABLE "Caption_table" ADD CONSTRAINT "Caption_table_fk1" FOREIGN KEY ("image_id") REFERENCES "Image"("id");
 
