@@ -88,7 +88,7 @@ apiRouter.post("/", async (req, res, next) =>{
   }
 });
 
-apiRouter.get("/:imageId", async (req, res, next) =>{
+apiRouter.get("/caption/:imageId", async (req, res, next) =>{
   const imageId = req.params.imageId;
   const query = `SELECT caption_table.caption, users.username FROM caption_table JOIN users 
   ON users.id = caption_table.user_id
